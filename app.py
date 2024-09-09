@@ -44,7 +44,7 @@ def convert_file():
         download_filename = os.path.splitext(file.filename)[0] + EXTENSIONS[format]
         
         try:
-            subprocess.run(['convert', input_filename, format, output_filename])
+            subprocess.run(['convert', input_filename, format, output_filename], check=True)
         except Exception as e:
             return f'Error converting file - {e}\n', 500
         

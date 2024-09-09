@@ -1,2 +1,2 @@
 #!/bin/sh
-mono /opt/ecg_convert/ECGTool.exe "$@"
+mono /opt/ecg_toolkit/ECGTool.exe "$@"
