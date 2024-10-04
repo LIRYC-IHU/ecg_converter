@@ -3,6 +3,7 @@ import os
 import tempfile
 import subprocess
 import io
+from correct_xml import correct_xml
 
 app = Flask(__name__)
 
@@ -43,8 +44,17 @@ def convert_file():
         output_filename = os.path.splitext(input_filename)[0] + '_converted' + EXTENSIONS[format]
         download_filename = os.path.splitext(file.filename)[0] + EXTENSIONS[format]
         
+        # Check if xml file needs correction and apply
+        if os.path.splitext(file.filename)[1] == '.xml':
+            correct_xml(input_filename)
+
         try:
-            subprocess.run(['convert', input_filename, format, output_filename], check=True)
+            output = subprocess.run(['mono', '/opt/ecg_toolkit/ECGTool.exe', input_filename, format, output_filename], check=True)
+            stdout = output.stdout.decode()
+
+            if 'ERROR' in stdout.upper():
+                raise RuntimeError(stdout)
+            
         except Exception as e:
             return f'Error converting file - {e}\n', 500
         
