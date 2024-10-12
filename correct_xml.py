@@ -16,29 +16,36 @@ def correct_xml(xml_filename: str):
     # Replace "low" tags that make the converter bug with "center" tags
     for etime in root.findall("effectiveTime/low/.."):
         low_tag = etime.find('low')
-        
-        center_tag = ET.Element('center')
-        # Copy attributes and text from 'low' if necessary
-        center_tag.attrib = low_tag.attrib
-        center_tag.text = low_tag.text
-        # Replace 'low' with 'center'
-        etime.remove(low_tag)
-        etime.append(center_tag)
+        high_tag = etime.find('high')
+
+        if low_tag is not None and high_tag is None:
+            center_tag = ET.Element('center')
+            # Copy attributes and text from 'low' if necessary
+            center_tag.attrib = low_tag.attrib
+            center_tag.text = low_tag.text
+            # Replace 'low' with 'center'
+            etime.remove(low_tag)
+            etime.append(center_tag)
 
     # 2. Find components with path AnnotatedECG>component>series>component>sequenceSet>component 
     # and sequence>code with code attribute TIME_ABSOLUTE
     sequence_set = root.find("component/series/component/sequenceSet")
     components = sequence_set.findall("component")
-    first_component_found = None
 
+    code_tags = []
     for component in components:
         code_tag = component.find("sequence/code")
-        if code_tag is not None and code_tag.attrib.get('code') == "TIME_ABSOLUTE":
-            if first_component_found is None:
-                first_component_found = component
-            else:
-                # Remove this component if it's not the first one
+        if code_tag is not None:
+            l_code_tag = code_tag.attrib.get('code')
+            if l_code_tag.startswith('TIME_') and ('TIME_ABSOLUTE' in code_tags or 'TIME_RELATIVE' in code_tags):
                 sequence_set.remove(component)
+
+            if l_code_tag not in code_tags:
+                code_tags.append(l_code_tag)
+            else:
+                sequence_set.remove(component)
+
+            
     
     # Save the modified XML file
     tree.write(xml_filename, encoding="utf-8", xml_declaration=True)
