@@ -4,6 +4,9 @@ import tempfile
 import subprocess
 import io
 from correct_xml import correct_xml
+import logging
+
+logger = logging.getLogger('uvicorn.error')
 
 app = Flask(__name__)
 
@@ -46,11 +49,12 @@ def convert_file():
         
         # Check if xml file needs correction and apply
         if os.path.splitext(file.filename)[1] == '.xml':
+            logger.info
             correct_xml(input_filename)
 
         try:
             output = subprocess.run(['mono', '/opt/ecg_toolkit/ECGTool.exe', input_filename, format, output_filename], check=True)
-            stdout = output.stdout.decode()
+            stdout = output.stdout.decode() if output.stdout else ''
 
             if 'ERROR' in stdout.upper():
                 raise RuntimeError(stdout)

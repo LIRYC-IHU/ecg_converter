@@ -2,14 +2,21 @@ import xml.etree.ElementTree as ET
 import sys
 import re
 
+import logging
+
+logger = logging.getLogger('uvicorn.error')
+
 def strip_namespace(element):
     for elem in element.iter():
         # Remove the namespace from the tag
         elem.tag = re.sub(r'\{.*\}', '', elem.tag)
     return element
 
-def correct_xml(xml_filename: str):
-    tree = ET.parse(xml_filename)
+def correct_xml(input_filename: str, output_filename: str = None):
+    if not output_filename:
+        output_filename = input_filename
+    
+    tree = ET.parse(input_filename)
     root = tree.getroot()
     root = strip_namespace(root)
 
@@ -38,17 +45,20 @@ def correct_xml(xml_filename: str):
         if code_tag is not None:
             l_code_tag = code_tag.attrib.get('code')
             if l_code_tag.startswith('TIME_') and ('TIME_ABSOLUTE' in code_tags or 'TIME_RELATIVE' in code_tags):
+                logger.debug(f'Removing {l_code_tag} section.')
                 sequence_set.remove(component)
+                continue
 
             if l_code_tag not in code_tags:
                 code_tags.append(l_code_tag)
             else:
+                logger.debug(f'Removing {l_code_tag} section.')
                 sequence_set.remove(component)
 
             
     
     # Save the modified XML file
-    tree.write(xml_filename, encoding="utf-8", xml_declaration=True)
+    tree.write(output_filename, encoding="utf-8", xml_declaration=True)
 
 if __name__ == '__main__':
-    correct_xml(sys.argv[1])
+    correct_xml(*sys.argv[1:])
