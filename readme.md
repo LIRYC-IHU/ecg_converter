@@ -21,13 +21,13 @@ The app will convert the input file on the fly, and return as a file attachment 
 
 Example call of the API:
 ```
-curl -F "file=@./Example.dcm" http://localhost/
+curl -F "file=@./Example.dcm" http://localhost/convert/
 ```
 This converts the example dicom file to an FDA aECG xml format. Results are displayed in the console.
 
 Example call of the API (2):
 ```
-curl -F "file=@./Example.xml" -F format=PDF --output output.pdf http://localhost/
+curl -F "file=@./Example.xml" -F format=PDF --output output.pdf http://localhost/convert/
 ```
 This converts the example aECG xml file to a PDF report, and saves the report to output.pdf
 
