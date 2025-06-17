@@ -1,0 +1,9 @@
+fastapi==0.78.0
+pydantic==1.9.1
+uvicorn==0.17.6
+psycopg2-binary==2.9.9
+lxml==4.9.3
+bs4==0.0.1
+smbprotocol==1.11.0
+pypdf==3.16.4
+python-multipart

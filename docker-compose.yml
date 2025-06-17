@@ -1,5 +1,7 @@
 services:
-  converter:
+  ecg-app:
     build: .
     restart: unless-stopped
-    ports: ["8090:80"]
+    ports: ["8002:80"]
+    environment:
+      - ROOT_PATH=/ecg_app/

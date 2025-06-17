@@ -49,7 +49,6 @@ def convert_file():
         
         # Check if xml file needs correction and apply
         if os.path.splitext(file.filename)[1] == '.xml':
-            logger.info
             correct_xml(input_filename)
 
         try:
